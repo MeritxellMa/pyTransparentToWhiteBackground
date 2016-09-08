@@ -14,13 +14,14 @@ def draw_firma_in_pdf(page_in_curr_docf, pdf_reader, pdf_writer, firma_path):
 
     if firma_path:
         can.drawImage(firma_path, pos_firma[0], pos_firma[1], pos_firma[2], pos_firma[3])
-    can.save()
-    packet.seek(0)
-    new_pdf = PyPDF2.PdfFileReader(packet)
-    new_page = new_pdf.getPage(0)
+        can.save()
+        packet.seek(0)
+        new_pdf = PyPDF2.PdfFileReader(packet)
+        new_page = new_pdf.getPage(0)
 
     page = existing_pdf.getPage(page_in_curr_docf)
-    page.mergePage(new_page)
+    if firma_path:
+        page.mergePage(new_page)
     pdf_writer.addPage(page)
     return True
 
@@ -86,8 +87,11 @@ for i in range(1, 4):
     pdf_writer = PyPDF2.PdfFileWriter()
     num_pages = pdf_reader.getNumPages()
     for pag in range(0, num_pages):
+        print 'num pag: %d num_pages:%d' % (pag, num_pages)
         if pag == num_pages - 1:
             draw_firma_in_pdf(pag, pdf_reader, pdf_writer, new_image)
+        else:
+            draw_firma_in_pdf(pag, pdf_reader, pdf_writer, None)
 
     output_stream = file("%s%s.pdf" % (new_dir_pdfs, original_pdfs[i-1][len(original_dir_pdfs):]), "wb")
     pdf_writer.write(output_stream)
