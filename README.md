@@ -1,1 +1,1 @@
-###Manipulate image background and insert image in pdf
+#####First python script: Manipulate image background and insert image in pdf
