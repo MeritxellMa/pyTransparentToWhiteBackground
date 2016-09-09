@@ -10,7 +10,6 @@ def draw_firma_in_pdf(curr_page, total_pages, page_in_curr_doc, pdf_reader, pdf_
     pos_firma = (22, 25, 267, 62)
     pos_pag = (750, 495)
 
-    existing_pdf = pdf_reader
     packet = StringIO.StringIO()
     can = canvas.Canvas(packet, pagesize=landscape(A4))  # (595,842))
 
@@ -23,14 +22,14 @@ def draw_firma_in_pdf(curr_page, total_pages, page_in_curr_doc, pdf_reader, pdf_
     packet.seek(0)
     new_pdf = PyPDF2.PdfFileReader(packet)
     new_page = new_pdf.getPage(0)
-    page = existing_pdf.getPage(page_in_curr_doc)
+    page = pdf_reader.getPage(page_in_curr_doc)
     page.mergePage(new_page)
     pdf_writer.addPage(page)
     return True
 
 
 def get_total_pages(pdfs):
-    #si comencen en 0, treure el +1
+    # si comencen en 0, treure el +1
     num_total_pages = 0
     for pdf in pdfs:
         num_total_pages += PyPDF2.PdfFileReader(open(pdf, 'rb')).getNumPages()
@@ -52,7 +51,7 @@ def get_main_color(image):
 
 def is_transparent(color):
     if color == 0:
-        print "was transparent"
+        print "is transparent"
         return True
     else:
         print "is white"
@@ -61,18 +60,15 @@ def is_transparent(color):
 
 def transparent_to_white(convert, image, old_dir, new_dir):
     img = Image.open(image)
-
     if convert:
         img = img.convert("RGBA")
         data = img.getdata()
-
         new_data = []
         for item in data:
             if item[3] == 0:
                 new_data.append((255, 255, 255))
             else:
                 new_data.append(item)
-
         img.putdata(new_data)
         #una altra forma:
         '''pixdata = img.load()
@@ -81,7 +77,6 @@ def transparent_to_white(convert, image, old_dir, new_dir):
             for x in xrange(img.size[0]):
                 if pixdata[x, y] == (0, 0, 0, 0):
                     pixdata[x, y] = (255, 255, 255, 255)'''
-
     image = image[len(old_dir):]
     img.save("%s%s" % (new_dir, image), "PNG")
 
@@ -95,7 +90,6 @@ original_pdfs = ("%s6694210" % original_dir_pdfs, "%s6691810" % original_dir_pdf
 new_pdfs = []
 
 for i in range(1, 4):
-
     original_image = "%sfirma%s.png" % (original_dir_images, i)
     new_image = "%sfirma%s.png" % (new_dir_images, i)
 
@@ -115,7 +109,7 @@ for i in range(1, 4):
         else:
             draw_firma_in_pdf(curr_page, total_pages, pag, pdf_reader, pdf_writer, None)
 
-    pdf_name="%s%s.pdf" % (new_dir_pdfs, original_pdfs[i-1][len(original_dir_pdfs):])
+    pdf_name = "%s%s.pdf" % (new_dir_pdfs, original_pdfs[i-1][len(original_dir_pdfs):])
     new_pdfs.append(pdf_name)
     output_stream = file(pdf_name, "wb")
     pdf_writer.write(output_stream)
@@ -124,5 +118,5 @@ for i in range(1, 4):
 merger = PyPDF2.PdfFileMerger()
 for pdf in new_pdfs:
     merger.append(PyPDF2.PdfFileReader(file(pdf, 'rb')))
-merger.write("%sallPdfs.pdf" %new_dir_pdfs)
+merger.write("%sallPdfs.pdf" % new_dir_pdfs)
 
