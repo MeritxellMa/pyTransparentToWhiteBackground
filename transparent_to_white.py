@@ -1,5 +1,6 @@
 from PIL import Image
 import PyPDF2
+import os
 
 
 def draw_firma_in_pdf(curr_page, total_pages, page_in_curr_doc, pdf_reader, pdf_writer, firma_path):
@@ -77,6 +78,8 @@ def transparent_to_white(convert, image, old_dir, new_dir):
             for x in xrange(img.size[0]):
                 if pixdata[x, y] == (0, 0, 0, 0):
                     pixdata[x, y] = (255, 255, 255, 255)'''
+    if not os.path.exists(new_dir):
+        os.makedirs(new_dir)
     image = image[len(old_dir):]
     img.save("%s%s" % (new_dir, image), "PNG")
 
@@ -109,6 +112,8 @@ for i in range(1, 4):
         else:
             draw_firma_in_pdf(curr_page, total_pages, pag, pdf_reader, pdf_writer, None)
 
+    if not os.path.exists(new_dir_pdfs):
+        os.makedirs(new_dir_pdfs)
     pdf_name = "%s%s.pdf" % (new_dir_pdfs, original_pdfs[i-1][len(original_dir_pdfs):])
     new_pdfs.append(pdf_name)
     output_stream = file(pdf_name, "wb")
