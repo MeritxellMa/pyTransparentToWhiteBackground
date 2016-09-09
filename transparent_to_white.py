@@ -66,18 +66,11 @@ def transparent_to_white(convert, image, old_dir, new_dir):
         data = img.getdata()
         new_data = []
         for item in data:
-            if item[3] == 0:
+            if item[3] <= 125:
                 new_data.append((255, 255, 255))
             else:
                 new_data.append(item)
         img.putdata(new_data)
-        #una altra forma:
-        '''pixdata = img.load()
-
-        for y in xrange(img.size[1]):
-            for x in xrange(img.size[0]):
-                if pixdata[x, y] == (0, 0, 0, 0):
-                    pixdata[x, y] = (255, 255, 255, 255)'''
     if not os.path.exists(new_dir):
         os.makedirs(new_dir)
     image = image[len(old_dir):]
