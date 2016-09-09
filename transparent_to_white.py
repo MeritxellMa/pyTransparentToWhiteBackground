@@ -18,10 +18,11 @@ def draw_firma_in_pdf(page_in_curr_docf, pdf_reader, pdf_writer, firma_path):
         packet.seek(0)
         new_pdf = PyPDF2.PdfFileReader(packet)
         new_page = new_pdf.getPage(0)
-
-    page = existing_pdf.getPage(page_in_curr_docf)
-    if firma_path:
+        page = existing_pdf.getPage(page_in_curr_docf)
         page.mergePage(new_page)
+    else:
+        page = existing_pdf.getPage(page_in_curr_docf)
+
     pdf_writer.addPage(page)
     return True
 
@@ -63,6 +64,13 @@ def transparent_to_white(convert, file, old_dir, new_dir):
                 new_data.append(item)
 
         img.putdata(new_data)
+        #una altra forma:
+        '''pixdata = img.load()
+
+        for y in xrange(img.size[1]):
+            for x in xrange(img.size[0]):
+                if pixdata[x, y] == (0, 0, 0, 0):
+                    pixdata[x, y] = (255, 255, 255, 255)'''
 
     file = file[len(old_dir):]
     img.save("%s%s" % (new_dir, file), "PNG")
@@ -77,7 +85,7 @@ for i in range(1, 4):
     new_dir_pdfs = "generated_pdfs/"
 
     original_image = "%sfirma%s.png" % (original_dir_images, i)
-    original_pdfs = ("%s6691810" % original_dir_pdfs, "%s6680710" % original_dir_pdfs, "%s6694210" % original_dir_pdfs)
+    original_pdfs = ("%s6694210" % original_dir_pdfs, "%s6680710" % original_dir_pdfs, "%s6691810" % original_dir_pdfs)
     new_image = "%sfirma%s.png" % (new_dir_images, i)
 
     transparent_to_white(is_transparent(get_main_color(original_image)), original_image, original_dir_images,
@@ -87,7 +95,6 @@ for i in range(1, 4):
     pdf_writer = PyPDF2.PdfFileWriter()
     num_pages = pdf_reader.getNumPages()
     for pag in range(0, num_pages):
-        print 'num pag: %d num_pages:%d' % (pag, num_pages)
         if pag == num_pages - 1:
             draw_firma_in_pdf(pag, pdf_reader, pdf_writer, new_image)
         else:
@@ -96,6 +103,3 @@ for i in range(1, 4):
     output_stream = file("%s%s.pdf" % (new_dir_pdfs, original_pdfs[i-1][len(original_dir_pdfs):]), "wb")
     pdf_writer.write(output_stream)
     output_stream.close()
-
-
-
